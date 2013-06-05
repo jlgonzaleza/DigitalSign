@@ -4,7 +4,7 @@
  */
 package co.softluciona.digitalsign.certificate.verify.revocation;
 
-import co.softluciona.digitalsign.certificate.verify.VerifyCertificateException;
+import co.softluciona.digitalsign.certificate.verify.exception.VerifyCertificateException;
 import java.io.File;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -15,6 +15,20 @@ import java.util.GregorianCalendar;
  */
 public class RevocationProperties {
 
+    /**
+     * @return the pathKeystore
+     */
+    public String getPathKeystore() {
+        return pathKeystore;
+    }
+
+    /**
+     * @param pathKeystore the pathKeystore to set
+     */
+    public void setPathKeystore(String pathKeystore) {
+        this.pathKeystore = pathKeystore;
+    }
+
     public enum RevocationType {
         CRL, OCSP
     }
@@ -22,8 +36,9 @@ public class RevocationProperties {
     private String pathCrl;
     private String ocspServer;
     private Calendar dateToVerify;
-
-    public RevocationProperties(RevocationType type, String pathCrl, Calendar dateToVerify, String oscpServer) throws VerifyCertificateException {
+    private String pathKeystore;
+    
+    public RevocationProperties(RevocationType type, String pathCrl, Calendar dateToVerify, String oscpServer,String pathKeystore) throws VerifyCertificateException {
         this.type = type;
         this.ocspServer = oscpServer;
         if (this.type.equals(RevocationType.CRL)) {
@@ -31,7 +46,7 @@ public class RevocationProperties {
             if (pathCrl != null && !pathCrl.isEmpty()) {
                 this.pathCrl = pathCrl;
                 File f = new File(pathCrl);
-                if (f.exists()) {
+                if (!f.exists()) {
                     throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.pathCrl"));
                 }
 
@@ -39,6 +54,15 @@ public class RevocationProperties {
                 throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.pathCrl"));
             }
         }
+        
+        if (pathKeystore != null && !pathKeystore.isEmpty()) {
+                this.pathKeystore = pathKeystore;
+                File f = new File(pathKeystore);
+                if (!(f.exists() && f.isFile())) {
+                    throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.keystore.valid"));
+                }
+
+            }
 
         if (dateToVerify == null) {
             this.dateToVerify = new GregorianCalendar();

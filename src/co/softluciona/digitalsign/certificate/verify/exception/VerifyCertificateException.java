@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.softluciona.digitalsign.certificate.verify;
+package co.softluciona.digitalsign.certificate.verify.exception;
 
 import co.softluciona.digitalsign.exception.DigitalSignException;
 import java.util.ResourceBundle;

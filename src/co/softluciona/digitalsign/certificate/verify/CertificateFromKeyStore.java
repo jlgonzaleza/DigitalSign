@@ -4,22 +4,17 @@
  */
 package co.softluciona.digitalsign.certificate.verify;
 
+import co.softluciona.digitalsign.certificate.verify.exception.VerifyCertificateException;
 import co.softluciona.digitalsign.certificate.CertificateInfo;
 import co.softluciona.digitalsign.certificate.verify.revocation.RevocationProperties;
-import co.softluciona.digitalsign.exception.DigitalSignException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
-import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  *
@@ -48,7 +43,7 @@ public class CertificateFromKeyStore extends CertificateVerify {
     }
 
     @Override
-    public void validate() throws VerifyCertificateException {
+    protected final void validate() throws VerifyCertificateException {
         if (this.certificateKeyStores == null) {
             throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.certificateBytes"));
         }

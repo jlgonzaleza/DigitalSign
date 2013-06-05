@@ -33,17 +33,17 @@ public class CertificateInfo {
     }
 
     private HashMap<String, String> getOIDsAndValues(String distinguishedName) {
-        HashMap<String, String> info = new HashMap<String, String>();
+        HashMap<String, String> info_ = new HashMap<String, String>();
         String[] stringArray = distinguishedName.split(",");
-        String[] stringArrayTemp = null;
+        String[] stringArrayTemp;
 
         for (int i = 0; i < stringArray.length; i++) {
             stringArrayTemp = stringArray[i].split("=");
             if (stringArrayTemp.length == 2) {
-                info.put(stringArrayTemp[0].toString(), stringArrayTemp[1].toString().trim());
+                info_.put(stringArrayTemp[0].toString(), stringArrayTemp[1].toString().trim());
             }
         }
-        return info;
+        return info_;
     }
 
     /**

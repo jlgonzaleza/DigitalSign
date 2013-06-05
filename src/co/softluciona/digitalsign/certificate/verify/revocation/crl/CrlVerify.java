@@ -4,8 +4,9 @@
  */
 package co.softluciona.digitalsign.certificate.verify.revocation.crl;
 
-import co.softluciona.digitalsign.certificate.verify.VerifyCertificateException;
+import co.softluciona.digitalsign.certificate.verify.exception.VerifyCertificateException;
 import co.softluciona.digitalsign.exception.DigitalSignException;
+import co.softluciona.digitalsign.utils.Utilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,9 +23,17 @@ import java.util.Calendar;
 public class CrlVerify {
 
     public static final String CRL_EXT = ".crl";
-    private String pathCrl;
+    private static String pathCrl;
 
-    public X509CRL loadCrl(String commonName) throws DigitalSignException {
+    
+    public static void verifyRevocation(X509Certificate cert, Calendar calendar,String pathCrl_, String commonName) throws VerifyCertificateException{
+        pathCrl = pathCrl_;
+       X509CRL crl =loadCrl(commonName);
+       verifyCrlExpireDate(crl, calendar);
+       verifyCertificateAgainsCrl(crl, cert, calendar);
+    }
+    
+    private static X509CRL loadCrl(String commonName) throws VerifyCertificateException {
         File crlFile = new File(pathCrl);
         File[] crls;
         if (pathCrl.endsWith(CRL_EXT)) {
@@ -51,13 +60,11 @@ public class CrlVerify {
                 try {
                     CertificateFactory cf = CertificateFactory.getInstance("X.509");
                     crlAux = (X509CRL) cf.generateCRL(fis);
-                    String key = "";
                     String[] CRLIssuerDN = crlAux.getIssuerDN().getName()
                             .split(",");
                     for (int j = 0; j < CRLIssuerDN.length; j++) {
                         if (CRLIssuerDN[j].trim().startsWith("CN=")) {
-                            key = CRLIssuerDN[j].substring(3).trim();
-                            if (key.equals(commonName)) {
+                            if (CRLIssuerDN[j].substring(3).trim().equals(commonName)) {
                                 return crlAux;
                             }
                         }
@@ -70,17 +77,17 @@ public class CrlVerify {
         throw new VerifyCertificateException(VerifyCertificateException.getMessage("crl.not.found"));
     }
 
-    private void verifyCrlExpireDate(X509CRL crl, Calendar calendar) throws DigitalSignException {
+    private static void verifyCrlExpireDate(X509CRL crl, Calendar calendar) throws VerifyCertificateException {
         if (crl.getNextUpdate().compareTo(calendar.getTime()) <= 0) {
-            throw new VerifyCertificateException(VerifyCertificateException.getMessage("crl.expired"));
+            throw new VerifyCertificateException(VerifyCertificateException.getMessage("crl.expired")+ Utilities.formatDate(crl.getNextUpdate()));
         }
     }
 
-    private void verifyCertificateAgainsCrl(X509CRL crl, X509Certificate cert, Calendar calendar) throws VerifyCertificateException {
+    private static void verifyCertificateAgainsCrl(X509CRL crl, X509Certificate cert, Calendar calendar) throws VerifyCertificateException {
        
             X509CRLEntry crlentry = crl.getRevokedCertificate(cert);
             if (crlentry != null && calendar.getTime().after(crlentry.getRevocationDate())) {
-                throw new VerifyCertificateException(VerifyCertificateException.getMessage("certificate.annulled"));
+                throw new VerifyCertificateException(VerifyCertificateException.getMessage("certificate.annulled")+ Utilities.formatDate(crlentry.getRevocationDate()));
             }
     }
 }
