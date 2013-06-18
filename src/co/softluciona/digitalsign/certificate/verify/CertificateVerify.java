@@ -32,7 +32,6 @@ public abstract class CertificateVerify {
 
     protected CertificateInfo certInfo;
     private RevocationProperties revocation;
-    private List<X509Certificate> caCertificates = new ArrayList<X509Certificate>();
     private KeyStore caKeystore;
 
     public CertificateVerify(RevocationProperties revocation) throws VerifyCertificateException {
@@ -45,15 +44,31 @@ public abstract class CertificateVerify {
 
     protected abstract void validate() throws VerifyCertificateException;
 
-    public CertificateInfo getCertificate() throws VerifyCertificateException {
-        verifyDate(this.certInfo.getCertificateX509(), revocation.getDateToVerify());
-        X509Certificate issuer = loadCA(this.certInfo.getInfoIssuer().get("CN"));
+    public CertificateInfo getCertificateInfo(){
+        return this.certInfo;
+    }
+    
+    public final CertificateInfo getVerifyAllCertificate() throws VerifyCertificateException {
+        verifyExpiredDate();
+        X509Certificate issuer = verifyTrust();
+        verifyRevocation(issuer);
+        return certInfo;
+    }
+    
+    public final X509Certificate verifyTrust() throws VerifyCertificateException{
+       return loadCA(this.certInfo.getInfoIssuer().get("CN"));
+    }
+    
+    public final void verifyRevocation(X509Certificate issuer) throws VerifyCertificateException{
         if (revocation.getType().equals(RevocationType.CRL)) {
             CrlVerify.verifyRevocation(this.certInfo.getCertificateX509(), revocation.getDateToVerify(), revocation.getPathCrl(), this.certInfo.getInfoIssuer().get("CN"));
         } else if (revocation.getType().equals(RevocationType.OCSP)) {
             ocspVerify(this.certInfo.getCertificateX509(),issuer);
         }
-        return certInfo;
+    }
+    
+    public final void verifyExpiredDate() throws VerifyCertificateException{
+        verifyDate(this.certInfo.getCertificateX509(), revocation.getDateToVerify());
     }
 
     private void verifyDate(X509Certificate cert, Calendar calendar) throws VerifyCertificateException {
@@ -71,7 +86,7 @@ public abstract class CertificateVerify {
 
 
         try {
-            caKeystore = loadCacertsKeyStore(this.certInfo.getProvider(), revocation.getPathKeystore());
+            caKeystore = loadCacertsKeyStore(revocation.getPathKeystore());
             Enumeration<String> localEnumeration = caKeystore.aliases();
             while (localEnumeration.hasMoreElements()) {
                 String str = (String) localEnumeration.nextElement();
@@ -103,7 +118,7 @@ public abstract class CertificateVerify {
         OcspClient ocspClient;
         String server = this.revocation.getOcspServer();
         if (server == null || server.isEmpty()) {
-            server = OcspUtils.getOcspUrl(cert);
+            server = certInfo.getOcspURL();
 
         }
 //        if (this.certParams.getRevocationVerify().isOcspProxy()) {
@@ -136,7 +151,7 @@ public abstract class CertificateVerify {
 //        }
     }
 
-    private KeyStore loadCacertsKeyStore(Provider provider, String keyStorePath) throws Exception {
+    private KeyStore loadCacertsKeyStore(String keyStorePath) throws Exception {
         File file;
         FileInputStream fin = null;
         boolean propio = false;

@@ -307,8 +307,8 @@ public class OcspClient
 		
 		if(ocspServer == null)
 		{
+                    throw new VerifyCertificateException(VerifyCertificateException.getMessage("oscp.url.error"));
 			// Se obtiene la URL del servidor OCSP al que se le enviar� la petici�n
-			ocspServer = ocspUtils.getOcspUrl(certToVerify);
 		}
 		
 		// Se env�a la petici�n y se obtiene la respectiva respuesta
@@ -557,18 +557,7 @@ public class OcspClient
 		}
 	}
 	
-	/**
-	 * M�todo que retorna la URL del servidor OCSP del certificado que se desea verificar
-	 * @return	Cadena de caracteres con el URL del servidor OCSP
-	 * @throws OcspException	Se lanza una excepci�n de este tipo si se
-	 * 			presenta alg�n inconveniente leyendo el campo de Acceso a la informaci�n de
-	 * 			autoridad del certificado a verificar.
-	 */
-	public String getCertificateOcspServer() throws VerifyCertificateException
-	{
-		return ocspUtils.getOcspUrl(certToVerify);
-	}
-	
+		
 	
 	//********************************************
 	// Getters y setters

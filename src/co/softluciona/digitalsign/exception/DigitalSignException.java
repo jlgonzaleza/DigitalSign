@@ -4,8 +4,6 @@
  */
 package co.softluciona.digitalsign.exception;
 
-import java.util.ResourceBundle;
-
 /**
  *
  * @author user
