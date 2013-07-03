@@ -8,17 +8,9 @@ import co.softluciona.digitalsign.certificate.verify.exception.VerifyCertificate
 import co.softluciona.digitalsign.certificate.CertificateInfo;
 import co.softluciona.digitalsign.certificate.verify.revocation.RevocationProperties;
 import co.softluciona.digitalsign.exception.DigitalSignException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
-import java.security.Security;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 

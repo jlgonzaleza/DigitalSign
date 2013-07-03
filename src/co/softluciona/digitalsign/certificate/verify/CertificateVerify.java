@@ -11,18 +11,22 @@ import co.softluciona.digitalsign.certificate.verify.revocation.RevocationProper
 import co.softluciona.digitalsign.certificate.verify.revocation.crl.CrlVerify;
 import co.softluciona.digitalsign.certificate.verify.revocation.ocsp.OcspClient;
 import co.softluciona.digitalsign.certificate.verify.revocation.ocsp.OcspResponse;
-import co.softluciona.digitalsign.certificate.verify.revocation.ocsp.OcspUtils;
 import co.softluciona.digitalsign.utils.Utilities;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyStore;
-import java.security.Provider;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
-import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -44,30 +48,30 @@ public abstract class CertificateVerify {
 
     protected abstract void validate() throws VerifyCertificateException;
 
-    public CertificateInfo getCertificateInfo(){
+    public CertificateInfo getCertificateInfo() {
         return this.certInfo;
     }
-    
+
     public final CertificateInfo getVerifyAllCertificate() throws VerifyCertificateException {
         verifyExpiredDate();
         X509Certificate issuer = verifyTrust();
         verifyRevocation(issuer);
         return certInfo;
     }
-    
-    public final X509Certificate verifyTrust() throws VerifyCertificateException{
-       return loadCA(this.certInfo.getInfoIssuer().get("CN"));
+
+    public final X509Certificate verifyTrust() throws VerifyCertificateException {
+        return loadCA(this.certInfo.getInfoIssuer().get("CN"));
     }
-    
-    public final void verifyRevocation(X509Certificate issuer) throws VerifyCertificateException{
+
+    public final void verifyRevocation(X509Certificate issuer) throws VerifyCertificateException {
         if (revocation.getType().equals(RevocationType.CRL)) {
             CrlVerify.verifyRevocation(this.certInfo.getCertificateX509(), revocation.getDateToVerify(), revocation.getPathCrl(), this.certInfo.getInfoIssuer().get("CN"));
         } else if (revocation.getType().equals(RevocationType.OCSP)) {
-            ocspVerify(this.certInfo.getCertificateX509(),issuer);
+            ocspVerify(this.certInfo.getCertificateX509(), issuer);
         }
     }
-    
-    public final void verifyExpiredDate() throws VerifyCertificateException{
+
+    public final void verifyExpiredDate() throws VerifyCertificateException {
         verifyDate(this.certInfo.getCertificateX509(), revocation.getDateToVerify());
     }
 
@@ -86,7 +90,7 @@ public abstract class CertificateVerify {
 
 
         try {
-            caKeystore = loadCacertsKeyStore(revocation.getPathKeystore());
+            caKeystore = loadCacertsKeyStore(revocation.getPathKeystore(), revocation.getStreamKeyStore());
             Enumeration<String> localEnumeration = caKeystore.aliases();
             while (localEnumeration.hasMoreElements()) {
                 String str = (String) localEnumeration.nextElement();
@@ -151,35 +155,66 @@ public abstract class CertificateVerify {
 //        }
     }
 
-    private KeyStore loadCacertsKeyStore(String keyStorePath) throws Exception {
-        File file;
-        FileInputStream fin = null;
+    private KeyStore loadCacertsKeyStore(String keyStorePath, InputStream keyStoreStream) throws VerifyCertificateException {
+        File file = null;
+        InputStream fin = null;
         boolean propio = false;
-        if (keyStorePath == null || keyStorePath.equals("")) {
+        if (keyStoreStream != null) {
+            fin = keyStoreStream;
+            propio = true;
+        } else if (keyStorePath == null || keyStorePath.equals("")) {
             file = new File(System.getProperty("java.home") + "/lib/security/cacerts");
         } else {
             file = new File(keyStorePath);
             propio = true;
         }
-        try {
-            fin = new FileInputStream(file);
-            KeyStore k;
-            k = KeyStore.getInstance("JKS");
-            if (!propio) {
-                k.load(fin, "changeit".toCharArray());
-            } else {
-                k.load(fin, "willman".toCharArray());
+        if (fin != null) {
+            try {
+                fin = new FileInputStream(file);
+            } catch (FileNotFoundException ex) {
+                throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.keystore.valid"));
+
             }
-            return k;
-        } catch (Exception e) {
-            throw new Exception(e);
+        }
+
+        KeyStore k;
+        try {
+            k = KeyStore.getInstance("JKS");
+        } catch (KeyStoreException ex) {
+            throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.keystore.jks.found"));
+
+        }
+        String password;
+        if (!propio) {
+            password = "changeit";
+        } else {
+            password = "S0ftluc10n4";
+        }
+        try {
+            k.load(fin, password.toCharArray());
+        } catch (NoSuchAlgorithmException e) {
+            throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.trust.keystore.decode"));
+        } catch (CertificateException e) {
+            throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.trust.keystore.data"));
+        } catch (IOException e) {
+            if (e.getMessage().toString().startsWith("failed to decryp")) {
+                throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.trust.keystore.password"));
+            } else {
+                throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.trust.keystore.right"));
+            }
         } finally {
             try {
                 if (fin != null) {
                     fin.close();
                 }
-            } catch (Exception ex) {
+            } catch (IOException ex) {
             }
         }
+
+
+
+
+        return k;
+
     }
 }

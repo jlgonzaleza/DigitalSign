@@ -6,6 +6,7 @@ package co.softluciona.digitalsign.certificate.verify.revocation;
 
 import co.softluciona.digitalsign.certificate.verify.exception.VerifyCertificateException;
 import java.io.File;
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -29,22 +30,64 @@ public class RevocationProperties {
         this.pathKeystore = pathKeystore;
     }
 
+    /**
+     * @return the streamKeyStore
+     */
+    public InputStream getStreamKeyStore() {
+        return streamKeyStore;
+    }
+
+    /**
+     * @param streamKeyStore the streamKeyStore to set
+     */
+    public void setStreamKeyStore(InputStream streamKeyStore) {
+        this.streamKeyStore = streamKeyStore;
+    }
+
     public enum RevocationType {
+
         CRL, OCSP
     }
     private RevocationType type;
     private String pathCrl;
     private String ocspServer;
     private Calendar dateToVerify;
-    private String pathKeystore;
+    private String pathKeystore = null;
+    private InputStream streamKeyStore = null;
     
-    public RevocationProperties(RevocationType type, String pathCrl, Calendar dateToVerify, String oscpServer,String pathKeystore) throws VerifyCertificateException {
+    public RevocationProperties(RevocationType type, String pathCrl, Calendar dateToVerify, String oscpServer, String pathKeystore) throws VerifyCertificateException {
         this.type = type;
         this.ocspServer = oscpServer;
+        this.pathCrl = pathCrl;
+        this.pathKeystore = pathKeystore;
+        this.dateToVerify = dateToVerify;
+        validate();
+    }
+    
+    public RevocationProperties(RevocationType type, String pathCrl, Calendar dateToVerify, String oscpServer, InputStream streamKeyStore) throws VerifyCertificateException {
+        this.type = type;
+        this.ocspServer = oscpServer;
+        this.pathCrl = pathCrl;
+        this.streamKeyStore = streamKeyStore;
+        this.dateToVerify = dateToVerify;
+        validate();
+    }
+
+    private void validate() throws VerifyCertificateException {
+        if (dateToVerify == null) {
+            this.dateToVerify = new GregorianCalendar();
+        }
+        if (pathKeystore != null && !pathKeystore.isEmpty()) {
+
+            File f = new File(pathKeystore);
+            if (!(f.exists() && f.isFile())) {
+                throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.keystore.valid"));
+            }
+        }
         if (this.type.equals(RevocationType.CRL)) {
 
             if (pathCrl != null && !pathCrl.isEmpty()) {
-                this.pathCrl = pathCrl;
+                
                 File f = new File(pathCrl);
                 if (!f.exists()) {
                     throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.pathCrl"));
@@ -53,21 +96,6 @@ public class RevocationProperties {
             } else {
                 throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.pathCrl"));
             }
-        }
-        
-        if (pathKeystore != null && !pathKeystore.isEmpty()) {
-                this.pathKeystore = pathKeystore;
-                File f = new File(pathKeystore);
-                if (!(f.exists() && f.isFile())) {
-                    throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.keystore.valid"));
-                }
-
-            }
-
-        if (dateToVerify == null) {
-            this.dateToVerify = new GregorianCalendar();
-        } else {
-            this.dateToVerify = dateToVerify;
         }
     }
 
