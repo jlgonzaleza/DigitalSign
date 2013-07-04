@@ -2,11 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.softluciona.digitalsign.certificate.verify;
+package co.softluciona.certificate.verify;
 
-import co.softluciona.digitalsign.certificate.verify.exception.VerifyCertificateException;
-import co.softluciona.digitalsign.certificate.CertificateInfo;
-import co.softluciona.digitalsign.certificate.verify.revocation.RevocationProperties;
+import co.softluciona.certificate.verify.exception.VerifyCertificateException;
+import co.softluciona.certificate.CertificateInfo;
+import co.softluciona.certificate.verify.revocation.RevocationProperties;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;

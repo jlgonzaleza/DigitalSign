@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.softluciona.digitalsign.utils;
+package co.softluciona.utils;
 
 import java.io.File;
 import java.io.FileInputStream;

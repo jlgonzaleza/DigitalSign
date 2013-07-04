@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.softluciona.digitalsign.certificate.verify.revocation;
+package co.softluciona.certificate.verify.revocation;
 
-import co.softluciona.digitalsign.certificate.verify.exception.VerifyCertificateException;
+import co.softluciona.certificate.verify.exception.VerifyCertificateException;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Calendar;

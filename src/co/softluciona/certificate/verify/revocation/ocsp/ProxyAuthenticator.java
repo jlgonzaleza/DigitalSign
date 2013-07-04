@@ -1,4 +1,4 @@
-package co.softluciona.digitalsign.certificate.verify.revocation.ocsp;
+package co.softluciona.certificate.verify.revocation.ocsp;
 
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;

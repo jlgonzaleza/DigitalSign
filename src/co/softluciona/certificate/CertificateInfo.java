@@ -2,9 +2,8 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.softluciona.digitalsign.certificate;
+package co.softluciona.certificate;
 
-import co.softluciona.digitalsign.certificate.verify.exception.VerifyCertificateException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.PrivateKey;

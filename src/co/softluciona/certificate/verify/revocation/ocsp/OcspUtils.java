@@ -1,6 +1,6 @@
-package co.softluciona.digitalsign.certificate.verify.revocation.ocsp;
+package co.softluciona.certificate.verify.revocation.ocsp;
 
-import co.softluciona.digitalsign.certificate.verify.exception.VerifyCertificateException;
+import co.softluciona.certificate.verify.exception.VerifyCertificateException;
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;

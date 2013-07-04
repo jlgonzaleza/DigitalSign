@@ -2,11 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.softluciona.digitalsign.certificate.verify.revocation.crl;
+package co.softluciona.certificate.verify.revocation.crl;
 
-import co.softluciona.digitalsign.certificate.verify.exception.VerifyCertificateException;
-import co.softluciona.digitalsign.exception.DigitalSignException;
-import co.softluciona.digitalsign.utils.Utilities;
+import co.softluciona.certificate.verify.exception.VerifyCertificateException;
+import co.softluciona.utils.Utilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

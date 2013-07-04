@@ -2,16 +2,16 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.softluciona.digitalsign.certificate.verify;
+package co.softluciona.certificate.verify;
 
-import co.softluciona.digitalsign.certificate.verify.exception.VerifyCertificateException;
-import co.softluciona.digitalsign.certificate.CertificateInfo;
-import co.softluciona.digitalsign.certificate.verify.revocation.RevocationProperties;
-import co.softluciona.digitalsign.certificate.verify.revocation.RevocationProperties.RevocationType;
-import co.softluciona.digitalsign.certificate.verify.revocation.crl.CrlVerify;
-import co.softluciona.digitalsign.certificate.verify.revocation.ocsp.OcspClient;
-import co.softluciona.digitalsign.certificate.verify.revocation.ocsp.OcspResponse;
-import co.softluciona.digitalsign.utils.Utilities;
+import co.softluciona.certificate.verify.exception.VerifyCertificateException;
+import co.softluciona.certificate.CertificateInfo;
+import co.softluciona.certificate.verify.revocation.RevocationProperties;
+import co.softluciona.certificate.verify.revocation.RevocationProperties.RevocationType;
+import co.softluciona.certificate.verify.revocation.crl.CrlVerify;
+import co.softluciona.certificate.verify.revocation.ocsp.OcspClient;
+import co.softluciona.certificate.verify.revocation.ocsp.OcspResponse;
+import co.softluciona.utils.Utilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -87,10 +87,10 @@ public abstract class CertificateVerify {
     }
 
     private X509Certificate loadCA(String commonName) throws VerifyCertificateException {
-
+        caKeystore = loadCacertsKeyStore(revocation.getPathKeystore(), revocation.getStreamKeyStore());
+            
 
         try {
-            caKeystore = loadCacertsKeyStore(revocation.getPathKeystore(), revocation.getStreamKeyStore());
             Enumeration<String> localEnumeration = caKeystore.aliases();
             while (localEnumeration.hasMoreElements()) {
                 String str = (String) localEnumeration.nextElement();
@@ -168,7 +168,7 @@ public abstract class CertificateVerify {
             file = new File(keyStorePath);
             propio = true;
         }
-        if (fin != null) {
+        if (fin == null) {
             try {
                 fin = new FileInputStream(file);
             } catch (FileNotFoundException ex) {
@@ -188,7 +188,7 @@ public abstract class CertificateVerify {
         if (!propio) {
             password = "changeit";
         } else {
-            password = "S0ftluc10n4";
+            password = "willman";
         }
         try {
             k.load(fin, password.toCharArray());
@@ -197,7 +197,7 @@ public abstract class CertificateVerify {
         } catch (CertificateException e) {
             throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.trust.keystore.data"));
         } catch (IOException e) {
-            if (e.getMessage().toString().startsWith("failed to decryp")) {
+            if (e.getMessage().toString().contains("password was incorrect")) {
                 throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.trust.keystore.password"));
             } else {
                 throw new VerifyCertificateException(VerifyCertificateException.getMessage("no.trust.keystore.right"));

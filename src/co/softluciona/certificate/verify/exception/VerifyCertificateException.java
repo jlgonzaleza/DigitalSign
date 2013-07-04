@@ -2,17 +2,16 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.softluciona.digitalsign.certificate.verify.exception;
+package co.softluciona.certificate.verify.exception;
 
-import co.softluciona.digitalsign.exception.DigitalSignException;
 import java.util.ResourceBundle;
 
 /**
  *
  * @author user
  */
-public class VerifyCertificateException extends DigitalSignException{
-    private static ResourceBundle resourceBundle = ResourceBundle.getBundle( "co.softluciona.digitalsign.messages.verify" );
+public class VerifyCertificateException extends Exception{
+    private static ResourceBundle resourceBundle = ResourceBundle.getBundle( "co.softluciona.messages.certificate" );
     
     public static String getMessage(String codeName){
        return  resourceBundle.getString(codeName);

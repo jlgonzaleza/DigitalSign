@@ -2,12 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.softluciona.digitalsign.certificate.verify;
+package co.softluciona.certificate.verify;
 
-import co.softluciona.digitalsign.certificate.verify.exception.VerifyCertificateException;
-import co.softluciona.digitalsign.certificate.CertificateInfo;
-import co.softluciona.digitalsign.certificate.verify.revocation.RevocationProperties;
-import co.softluciona.digitalsign.exception.DigitalSignException;
+import co.softluciona.certificate.verify.exception.VerifyCertificateException;
+import co.softluciona.certificate.CertificateInfo;
+import co.softluciona.certificate.verify.revocation.RevocationProperties;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.cert.Certificate;
@@ -25,14 +24,14 @@ public class CertificateFromX509 extends CertificateVerify {
     private Certificate[] certificateChain = null;
     private Provider provider = null;
     
-    public CertificateFromX509(X509Certificate certificateX509, RevocationProperties revocation) throws DigitalSignException {
+    public CertificateFromX509(X509Certificate certificateX509, RevocationProperties revocation) throws VerifyCertificateException {
         super(revocation);
         this.certificateX509 = certificateX509;
         validate();
     }
 
     public CertificateFromX509(X509Certificate certificateX509, PrivateKey privateKey , Certificate[] certificateChain,
-            Provider provider, RevocationProperties revocation) throws DigitalSignException {
+            Provider provider, RevocationProperties revocation) throws VerifyCertificateException {
         super(revocation);
         this.certificateX509 = certificateX509;
         this.privateKey = privateKey;

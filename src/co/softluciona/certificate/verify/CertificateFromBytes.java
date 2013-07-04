@@ -2,12 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.softluciona.digitalsign.certificate.verify;
+package co.softluciona.certificate.verify;
 
-import co.softluciona.digitalsign.certificate.verify.exception.VerifyCertificateException;
-import co.softluciona.digitalsign.certificate.CertificateInfo;
-import co.softluciona.digitalsign.certificate.verify.revocation.RevocationProperties;
-import co.softluciona.digitalsign.exception.DigitalSignException;
+import co.softluciona.certificate.verify.exception.VerifyCertificateException;
+import co.softluciona.certificate.CertificateInfo;
+import co.softluciona.certificate.verify.revocation.RevocationProperties;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -30,7 +29,7 @@ public class CertificateFromBytes extends CertificateVerify {
     private String passwordCertificate;
     private String alias;
 
-    public CertificateFromBytes(byte[] certificateBytes, String passwordCertificate, RevocationProperties revocation) throws DigitalSignException {
+    public CertificateFromBytes(byte[] certificateBytes, String passwordCertificate, RevocationProperties revocation) throws VerifyCertificateException {
         super(revocation);
         this.alias = "";
         this.certificateBytes = certificateBytes;
@@ -38,7 +37,7 @@ public class CertificateFromBytes extends CertificateVerify {
         validate();
     }
 
-    public CertificateFromBytes(byte[] certificateBytes, String passwordCertificate, String alias, RevocationProperties revocation) throws DigitalSignException {
+    public CertificateFromBytes(byte[] certificateBytes, String passwordCertificate, String alias, RevocationProperties revocation) throws VerifyCertificateException {
         super(revocation);
         this.alias = alias;
         this.certificateBytes = certificateBytes;
